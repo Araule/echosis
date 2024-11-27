@@ -6,5 +6,5 @@ google-api-python-client
 spacy
 augmenty
 scikit-learn
-gensim
-pyldavis
+# gensim
+# pyldavis
