@@ -5,6 +5,10 @@
 
 I recommend python 3.10 or 3.11 but not higher, there are some problems in the dependencies.
 
+> [!WARNING]
+> Gensim and Spacy do not use the same version of numpy right now, so you need to make to environment to use them...
+
+
 If you want to train a transformers model on GPU with SpaCy, you need to download extra libraries. See [here](https://spacy.io/usage) for more informations.
 
 You need to choose and download one [spacy model](https://spacy.io/models), which will be use to preprocess the corpus for topic model and classification model. 
