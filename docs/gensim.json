@@ -1,0 +1,19 @@
+{
+	"input_file": "./corpus/tatiana_ventose_videos.csv",
+	"model_output_dir": "./corpus/gensim/model/",
+	"model_infos_dir": "./corpus/gensim/",
+	"spacy_model": "fr_core_news_lg",
+	"more_stop": [" ", "euh", "heu", "hein"],
+	"no_below": 4,
+	"no_above": 0.5,
+	"visdom_flag": true,
+	"convergence_distance": "jaccard",
+	"coherence_metric": "c_v",
+	"num_topics": 20,
+	"passes": 30,
+	"iterations": 50,
+	"chunksize": 2000,
+	"alpha": "auto",
+	"eta": "auto",
+	"minimum_probability": 0.3
+}

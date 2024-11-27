@@ -1,0 +1,10 @@
+minet
+polars
+matplotlib
+seaborn
+google-api-python-client
+spacy
+augmenty
+scikit-learn
+gensim
+pyldavis
