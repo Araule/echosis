@@ -3,7 +3,7 @@ from echosis import utils
 
 spacy_model = "fr_core_news_lg"   # do not use transformer model for data augmentation
 
-
+# split corpus in k sub-corpus for k-fold cross-validation
 utils.k_fold(
     input_file="./corpus/annotations/annotated_corpus.jsonl",
     output_dir="./corpus/k_fold/",
@@ -11,6 +11,7 @@ utils.k_fold(
     dev=True
 )
 
+# train models
 print("\n\n# ====================================================")
 print("# k-fold cross validation")
 print("# ====================================================\n\n")
@@ -32,4 +33,10 @@ for k in [1, 2, 3, 4, 5]:
 
     sm.scores(f"./corpus/k_fold/test_{k}.jsonl",
               f"./models/{k}/model-best"
+    )
+
+# annotate corpus
+sm.write_annots(
+    input_file="./corpus/tatiana_ventose_comments.csv",
+    model_path="./models/3/model-best"
     )

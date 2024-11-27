@@ -5,7 +5,10 @@
 # to train classification models
 # for agreement annotation
 #
-
+# do not forget to init base_config
+# python -m spacy init fill-config ./docs/gpu_base_config.cfg ./docs/gpu_config.cfg
+# python -m spacy init fill-config ./docs/cpu_base_config.cfg ./docs/cpu_config.cfg
+#
 
 import os
 import spacy
@@ -22,7 +25,7 @@ from typing import Optional
 import matplotlib as plt
 
 
-def spacy_file(dataset: list[tuple[str]], output_file: str) -> None:
+def create_spacy_file(dataset: list[tuple[str]], output_file: str) -> None:
     """to transform dataset in SPACY file for training.
 
     Args:
@@ -54,20 +57,20 @@ def preprocess(train_path: str, dev_path: str, spacy_model: str, n_sentence: Opt
     augmented_train = data_augmentation(text, label, spacy_model, n_sentence)
 
     path, _ = os.path.splitext(train_path)
-    spacy_file(augmented_train, path+".spacy")
+    create_spacy_file(augmented_train, path+".spacy")
 
     dev = load_file(dev_path)
     dev = [(text, label) for text, label in zip(dev["text"].to_list(), dev["label"].to_list())]
     path, _ = os.path.splitext(dev_path)
-    spacy_file(dev, path+".spacy")
+    create_spacy_file(dev, path+".spacy")
 
 
 def data_augmentation(texts: list[str], labels: list[str], spacy_model: str, n_sentence: int) -> list[tuple[str]]:
-    """to perform data augmentation on train dataset.
+    """to perform data augmentation on train dataset
 
     Args:
         texts (str): list of texts.
-        labels (str): list of labels associated to texts.
+        labels (str): list of labels associated with texts.
         spacy_model (str): name or path of the spacy model.
         n_sentence (int): number of sentences created for each train text.
     """
@@ -119,12 +122,14 @@ def scores(test_path, model_path) -> None:
     print(classification_report(y_true, y_pred))
     get_confusion_matrix(y_true, y_pred)
 
+
 def cross_validation_scores(test_pattern_path: str, models_path: str) -> None:
-    """ to test models obtain through k-fold cross-validation and get scores.
+    """to test models obtain through k-fold cross-validation and get scores.
+        still working on it.
 
     Args:
         test_pattern_path (str): path to test datasets.
-            Exemple: "./corpus/test*.jsonl".
+            exemple: "./corpus/test*.jsonl".
         models_path (str): path to save model file.
     """
     files = [[load_file(file).get_column("text").to_list(), load_file(file).get_column("label").to_list()] for file in glb.glob(test_pattern_path)]
@@ -133,7 +138,8 @@ def cross_validation_scores(test_pattern_path: str, models_path: str) -> None:
     for i, texts, y_true in enumerate(files):
         y_pred = get_annots(texts, models_path+f"{i+1}/model-best/")
         results.append(classification_report(y_true, y_pred, output_dict=True))
-        get_confusion_matrix(y_true, y_pred).savefig(f"./cm_{i+1}.png")
+        # print(f"confusion matrix saved at ./cm_{i+1}.png")
+        # get_confusion_matrix(y_true, y_pred).savefig(f"./cm_{i+1}.png")
     print(results)
 
 
@@ -145,7 +151,7 @@ def get_annots(texts: list[str], model_path: str) -> list[str]:
         model_path (str): trained spacy model.
 
     Returns:
-
+        list[str]: list of predicted labels
     """
     nlp = spacy.load(model_path)
     docs = nlp.pipe(texts)
@@ -162,40 +168,40 @@ def get_confusion_matrix(y_true: list[str], y_pred: list[str], k: Optional[int] 
         k (int, optional): id of the fold if confusion matrix is needed for k-fold cross-validation.
             it really is optional.
             it's for the title...
-            Defaults to None.
+            defaults to None.
     """
     cm = confusion_matrix(y_true, y_pred)
 
-    f, ax = plt.subplots(figsize=(8, 6))
+    _, _ = plt.subplots(figsize=(8, 6))
     sns.heatmap(cm, annot=True, fmt=".1f", cmap="Blues")
 
     if k:
-        plt.title(f"Matrice de confusion pour k={k}", fontsize=20, fontweight="bold")
+        plt.title(f"Confusion Matrix for k={k}", fontsize=20, fontweight="bold")
     else:
-        plt.title("Matrice de confusion", fontsize=20, fontweight="bold")
+        plt.title("Confusion Matrix", fontsize=20, fontweight="bold")
 
-    plt.xlabel("Etiquettes prédites", fontsize=14)
-    plt.ylabel("Etiquettes correctes", fontsize=14)
+    plt.xlabel("Predicted labels", fontsize=14)
+    plt.ylabel("True labels", fontsize=14)
 
-    plt.show()
+    return plt
 
 
-def write_annots(input_file: str, model_path: str):
-    """to annotate comments with spacy model.
+def write_annots(input_file: str, model_path: str) -> None:
+    """to annotate comments with a spacy model.
 
     Arguments:
         input_file (str): path to a comments file with 'text' column.
-        model_path (str): path to the model trained with spacy.
+        model_path (str): path to the spacy classification model.
     """
     comments = load_file(input_file)
 
     nlp = spacy.load(model_path)
     docs = nlp.pipe(comments["text"].to_list())
+    textcat = nlp.get_pipe("textcat")
 
-    for label in nlp.labels:
+    for label in textcat.labels:
         comments = comments.with_columns(
             [doc.cats[label] for doc in docs].alias(label)
         )
 
     save_file(comments, input_file)
-
