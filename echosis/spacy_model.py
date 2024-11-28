@@ -186,22 +186,34 @@ def get_confusion_matrix(y_true: list[str], y_pred: list[str], k: Optional[int] 
     return plt
 
 
-def write_annots(input_file: str, model_path: str) -> None:
-    """to annotate comments with a spacy model.
+def write_annots(input_file: str, model_path: str):
+    """to annotate first comments and replies with spacy model.
 
     Arguments:
         input_file (str): path to a comments file with 'text' column.
-        model_path (str): path to the spacy classification model.
+        model_path (str): path to the model trained with spacy.
     """
     comments = load_file(input_file)
+    discussions = comments.filter(pl.col("position") > 0)
 
     nlp = spacy.load(model_path)
-    docs = nlp.pipe(comments["text"].to_list())
+    docs = nlp.pipe(discussions["text"].to_list())
     textcat = nlp.get_pipe("textcat")
 
+    annots = {}
     for label in textcat.labels:
-        comments = comments.with_columns(
-            [doc.cats[label] for doc in docs].alias(label)
-        )
+        annots[label] = []
+
+    for doc in track(docs, description="get annotations", total=len(discussions["text"].to_list())):
+        for label in textcat.labels:
+            annots[label].append(doc.cats[label])
+
+    # delete old annotations if they exist
+    for label in textcat.labels:
+        if label in comments.columns:
+            comments = comments.drop(label)
+
+    discussions = pl.concat([discussions.select("comment_id"), pl.DataFrame(annots)], how="horizontal")
+    comments = comments.join(discussions, on="comment_id", how="left")
 
     save_file(comments, input_file)
