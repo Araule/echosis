@@ -1,4 +1,5 @@
-# ECHO chamber analySIS: one framework to analyse of echo chambers on YouTube
+# ECHO chamber analySIS
+## A framework to analyse of echo chambers on YouTube
 
 
 ## Installation
