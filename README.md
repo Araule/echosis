@@ -5,7 +5,7 @@
 ## Installation
 
 > [!WARNING]
-> Sadly, Gensim and SpaCy do not use the same version of numpy right now, so you will need to make two environments to use the framework... Hopefully, things will be cleared soon.
+> Sadly, Gensim and SpaCy do not use the same version of numpy right now, so the requirements are for an older version of spacy and scikit-learn... Hopefully, things will be cleared soon.
 
 If you want to train a transformers model on GPU with SpaCy, you need to download extra libraries. See [here](https://spacy.io/usage) for more informations. You also need to choose and download one [spacy model](https://spacy.io/models), which will be use to preprocess the corpus for topic modeling and training a classification model. If you want to use the [prodi.gy library](https://prodi.gy/), See [here](https://prodi.gy/docs/install) to follow the installation steps. Last step, create your (two) python environment(s).
 
