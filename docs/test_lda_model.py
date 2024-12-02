@@ -19,7 +19,7 @@ print("number of tokens in each documents:", ", ".join([str(len(d)) for d in doc
 model = lda_model.train_model(conf_path, corpus, docs, id2word, dictionary)
 
 # save model
-lda_model.save_model(conf_path, model, corpus, dictionary, docs)
+lda_model.save_model(conf_path, model, corpus, dictionary)
 
 # get model infos by loading model
 lda_model.write_infos(conf_path)
