@@ -14,7 +14,7 @@ toxicity_model.preprocess(
 
 # annotate
 toxicity_model.annotate(
-	api_key="key",
+	api_key="YOUR_API_KEY",
 	corpus_file="./corpus/perspective/corpus.json",
 	annot_file="./corpus/perspective/annots.jsonl",
 	error_file="./corpus/perspective/errors.log"
