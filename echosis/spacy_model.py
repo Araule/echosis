@@ -22,7 +22,8 @@ from echosis.utils import load_file, save_file
 from sklearn.metrics import confusion_matrix, classification_report
 import seaborn as sns
 from typing import Optional
-import matplotlib as plt
+import matplotlib.pyplot as plt
+import json
 
 
 def create_spacy_file(dataset: list[tuple[str]], output_file: str) -> None:
@@ -49,12 +50,16 @@ def preprocess(train_path: str, dev_path: str, spacy_model: str, n_sentence: Opt
         dev_path (str): path to dev dataset.
         spacy_model (str): name or path of the spacy model.
         n_sentence (int): number of sentences created for each train text.
+            if 0, no augmentation is performed.
     """
     train = load_file(train_path)
     text = train["text"].to_list()
     label = train["label"].to_list()
 
-    augmented_train = data_augmentation(text, label, spacy_model, n_sentence)
+    if n_sentence == 0:
+        augmented_train = [[t,l] for t, l in zip(text, label)]
+    else:
+        augmented_train = data_augmentation(text, label, spacy_model, n_sentence)
 
     path, _ = os.path.splitext(train_path)
     create_spacy_file(augmented_train, path+".spacy")
@@ -65,7 +70,7 @@ def preprocess(train_path: str, dev_path: str, spacy_model: str, n_sentence: Opt
     create_spacy_file(dev, path+".spacy")
 
 
-def data_augmentation(texts: list[str], labels: list[str], spacy_model: str, n_sentence: int) -> list[tuple[str]]:
+def data_augmentation(texts: list[str], labels: list[str], spacy_model: str, n_sentence: int) -> list[list[str]]:
     """to perform data augmentation on train dataset
 
     Args:
@@ -120,7 +125,7 @@ def scores(test_path, model_path) -> None:
     y_true = test["label"].to_list()
 
     print(classification_report(y_true, y_pred))
-    get_confusion_matrix(y_true, y_pred)
+    get_confusion_matrix(y_true, y_pred).show()
 
 
 def cross_validation_scores(test_pattern_path: str, models_path: str) -> None:
@@ -129,18 +134,26 @@ def cross_validation_scores(test_pattern_path: str, models_path: str) -> None:
 
     Args:
         test_pattern_path (str): path to test datasets.
-            exemple: "./corpus/test*.jsonl".
-        models_path (str): path to save model file.
+            exemple: "./corpus/k_fold/test*.jsonl".
+        models_path (str): path to saved models directory.
+            exemple: "models/k_fold/"
     """
-    files = [[load_file(file).get_column("text").to_list(), load_file(file).get_column("label").to_list()] for file in glb.glob(test_pattern_path)]
+    files = [(load_file(file).get_column("text").to_list(), load_file(file).get_column("label").to_list()) for file in glb.glob(test_pattern_path)]
 
-    results = []
-    for i, texts, y_true in enumerate(files):
+    results = {}
+    
+    for i, file in enumerate(files):
+        texts, y_true = file
+        
         y_pred = get_annots(texts, models_path+f"{i+1}/model-best/")
-        results.append(classification_report(y_true, y_pred, output_dict=True))
-        # print(f"confusion matrix saved at ./cm_{i+1}.png")
-        # get_confusion_matrix(y_true, y_pred).savefig(f"./cm_{i+1}.png")
-    print(results)
+        results[i+1] = classification_report(y_true, y_pred, output_dict=True)
+        
+        print(f"confusion matrix saved at ./cm_k-{i+1}.png")
+        get_confusion_matrix(y_true, y_pred, i+1).savefig(f"./cm_k-{i+1}.png")
+
+    print("classification report saved at ./classification_report.json")
+    with open("./classification_report.json", "w") as f:
+        json.dump(results, f, indent=4)
 
 
 def get_annots(texts: list[str], model_path: str) -> list[str]:
@@ -172,16 +185,16 @@ def get_confusion_matrix(y_true: list[str], y_pred: list[str], k: Optional[int] 
     """
     cm = confusion_matrix(y_true, y_pred)
 
-    _, _ = plt.subplots(figsize=(8, 6))
-    sns.heatmap(cm, annot=True, fmt=".1f", cmap="Blues")
+    _, ax = plt.subplots(figsize=(8, 6))
+    sns.heatmap(cm, annot=True, fmt=".1f", cmap="Blues", ax=ax)
 
     if k:
-        plt.title(f"Confusion Matrix for k={k}", fontsize=20, fontweight="bold")
+        ax.set_title(f"Confusion Matrix for k={k}", fontsize=20, fontweight="bold")
     else:
-        plt.title("Confusion Matrix", fontsize=20, fontweight="bold")
+        ax.set_title("Confusion Matrix", fontsize=20, fontweight="bold")
 
-    plt.xlabel("Predicted labels", fontsize=14)
-    plt.ylabel("True labels", fontsize=14)
+    ax.set_xlabel("Predicted labels", fontsize=14)
+    ax.set_ylabel("True labels", fontsize=14)
 
     return plt
 

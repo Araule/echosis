@@ -6,8 +6,7 @@
 #
 
 from minet.cli.utils import get_rcfile
-from minet.youtube import YouTubeAPIClient
-from minet.youtube import YouTubeScraper
+from minet.youtube import YouTubeAPIClient, YouTubeScraper
 from minet.youtube.exceptions import (
     YouTubeDisabledCommentsError,
     YouTubeNotFoundError,
@@ -15,6 +14,7 @@ from minet.youtube.exceptions import (
     YouTubeUnknown403Error,
 )
 import polars as pl
+from polars.exceptions import ShapeError
 from rich.progress import track
 from echosis.utils import load_file, save_file
 
@@ -131,6 +131,8 @@ def get_comments(input_file: str, output_file: str) -> None:
             print(video, "exclusive-member")
         except YouTubeUnknown403Error:
             print(video, "403-error")
+        except ShapeError:
+            print(video, "no-comments-scrapped")
 
     print("cleaning comments...")
     comments_df = comments_df.join(
