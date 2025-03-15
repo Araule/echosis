@@ -36,6 +36,20 @@ At last, you need to set up the [.minetrc file](https://github.com/medialab/mine
 
 All functions are commented, and Python files are in the docs directory to show you how to import and use every part of the processing chain. Soon, you will be able to use the framework through a command-line interface.
 
+## Cite
+
+```
+Darenne, L. (2024). Propositions pour l'identification, la modélisation et la quantification des chambres d’écho : Expérimentation sur un corpus de commentaires YouTube. Master Thesis, Institut National des Langues et Civilisations Orientales.
+```
+
+```
+@mastersthesis{darenne_2024,
+    author = "Laura Darenne",
+    title = "Propositions pour l'identification, la modélisation et la quantification des chambres d’écho : Expérimentation sur un corpus de commentaires YouTube",
+    school = "Institut National des Langues et Civilisations Orientales",
+    year = "2024"
+}
+```
 
 ## Main libraries used
 
