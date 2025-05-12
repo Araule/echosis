@@ -30,7 +30,6 @@ import pickle
 import polars as pl
 import os
 import numpy as np
-from sklearn.metrics import davies_bouldin_score, silhouette_score, calinski_harabasz_score, silhouette_samples
 
 
 ProcessedCorpus = tuple[list[list[tuple[int, int]]], list[list[str]], dict, Dictionary]
@@ -128,22 +127,6 @@ def train_model(config_file: str, corpus: list[list[tuple[int, int]]], docs: lis
             alpha=conf.alpha,
             eta=conf.eta,
         )
-
-    # calculate scores
-    doc_topic_distributions = [model.get_document_topics(doc) for doc in corpus]
-    X = np.zeros((len(docs), model.num_topics))
-    for i, doc_topics in enumerate(doc_topic_distributions):
-        for topic_id, prob in doc_topics:
-            X[i, topic_id] = prob
-
-    db_score = davies_bouldin_score(X, np.argmax(X, axis=1))
-    print("Davies-Bouldin Score:", db_score)
-
-    s_score = silhouette_score(X, np.argmax(X, axis=1))
-    print("Silhouette Score:", s_score)
-
-    ch_score = calinski_harabasz_score(X, np.argmax(X, axis=1))
-    print("Calinski Harabasz Score:", ch_score)
 
     return model
 
