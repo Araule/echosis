@@ -1,13 +1,10 @@
 # ECHO chamber analySIS
-## A framework to analyse of echo chambers on YouTube
 
+A framework to analyse of echo chambers on YouTube (for now...)
 
 ## Installation
 
-> [!WARNING]
-> Sadly, Gensim and SpaCy do not use the same version of numpy right now, so the requirements are for an older version of spacy and scikit-learn... Hopefully, things will be cleared soon.
-
-If you want to train a transformers model on GPU with SpaCy, you need to download extra libraries. See [here](https://spacy.io/usage) for more informations. You also need to choose and download one [spacy model](https://spacy.io/models), which will be use to preprocess the corpus for topic modeling and training a classification model. If you want to use the [prodi.gy library](https://prodi.gy/), See [here](https://prodi.gy/docs/install) to follow the installation steps. Last step, create your (two) python environment(s).
+If you want to train a transformers model on GPU with SpaCy, you need to download extra libraries. See [here](https://spacy.io/usage) for more informations. You also need to choose and download one [spacy model](https://spacy.io/models), which will be use to preprocess the corpus for topic modeling and training a classification model. Last step, create your python environment.
 
 ```bash
 # venv
@@ -26,11 +23,9 @@ No need to worry about directories, they will be created when saving files or mo
 
 You need to get a key to access [Youtube Data API v3](https://developers.google.com/youtube/registering_an_application) and another one to access [Perspective API](https://developers.google.com/codelabs/setup-perspective-api#5). You can also request an increase of quota for [youtube](https://support.google.com/youtube/contact/yt_api_form) or [perspective](https://developers.perspectiveapi.com/s/request-quota-increase?language=en_US), if you are particulary impatient or are scrapping a big youtube channel. I cannot garantee your requests will be granted.
 
-At last, you need to set up the [.minetrc file](https://github.com/medialab/minet/blob/master/docs/cli.md#minetrc-config-files) in the directory where you will run the scripts (better just outside of `./echosis/*.py`). [Minet](https://github.com/medialab/minet) is needed to scrap youtube and get the corpus.
+### YouTube Corpus
 
-> [!TIP]
-> The easiest way is to make a json file with this one line : `{"youtube": {"key": ["your_api_key"]}}`
-
+You can use our scripts to get corpus from YouTube through the API. For more information, see [Echosis Misc](https://github.com/Araule/echosis_misc/tree/main).
 
 ## Documentation
 
