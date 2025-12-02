@@ -25,7 +25,7 @@ You need to get a key to access [Youtube Data API v3](https://developers.google.
 
 ### YouTube Corpus
 
-You can use our scripts to get corpus from YouTube through the API. For more information, see [Echosis Misc](https://github.com/Araule/echosis_misc/tree/main).
+You can use our scripts to get corpus from YouTube through the API. For more information, see `misc` directory.
 
 ## Documentation
 
